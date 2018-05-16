@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-toolbar
+       color="blue"
+       dark
+       >
+        <v-toolbar-items>
+          <v-btn flat>Verification</v-btn>
+          <v-btn flat>Stats</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-content>
+        
+      <v-container>
+       <v-data-table
+        :headers="headers"
+        :items="users"
+         show-actions
+        class="elevation-1"
+       >
+    <template slot="items" slot-scope="props">
+      <td>{{ props.item.name }}</td>
+      <!-- <td class="text-xs-right">{{ props.item.login }}</td> -->
+      <td class="text-xs-left">{{ props.item.uid }}</td>
+      <!-- <td class="text-xs-right">{{ props.item.provider }}</td> -->
+      <!-- <td class="text-xs-right">{{ props.item.ver }} </td> -->
+      <td class="text-xs-left">
+        <v-btn color="success" v-if="verUsers.includes(props.item.uid)">Verified
+          <v-icon dark right>done</v-icon>
+        </v-btn>
+        <v-btn color="error" v-else @click="newVer(props.item.uid)">Not verified
+          <v-icon dark right>clear</v-icon>
+        </v-if>
+      </td>
+    </template>
+  </v-data-table>  
+      </v-container>
+      </v-content>
+    </v-app>
+  </div>
+ 
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+  <script>
+  new Vue({
+  el: '#app',
+  data () {
+    return {
+      verU: [],
+      users: [],
+      headers: [
+          {
+            text: 'Users table',
+            align: 'center',
+            sortable: true,
+            value: 'name'
+          },
+          // { text: 'user login', value: 'userLogin' },
+          { text: 'user ID', value: 'userUID' },
+          // { text: 'provider', value: 'provider' },
+          // { text: 'verified', value: 'singIn' },
+           { text: 'actions', value: '' },
+        ],
+        users: [
+          
+        ]
+    }
+  },
+  computed: {
+    verUsers: function() {
+      return this.verU
+    }
+  },
+  created() {
+    this.users = this.fetchUsers()
+  },
+  methods: {
+    fetchUsers: function() {
+        fetch ('http://localhost:3000/getUsers')
+        .then(responce => {
+            return (responce.json())
+        })
+        .then(data => {
+          console.log(data)
+          let tempUsers = JSON.parse(JSON.stringify(data))
+          this.verU = tempUsers.verUsers
+          return this.users = tempUsers.usersArr
+        })
+    },
+    newVer: (uid) => {
+      let verObj = {}
+      verObj.uid = uid
+      verObj.location = "PZN" 
+      Vue.http.post("/addVer", verObj)
+      console.log(verObj);
+    }
+  }
+});
+  </script>
+</body>
+</html>
