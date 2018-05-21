@@ -19,13 +19,13 @@
         </v-toolbar-items>
       </v-toolbar>
       <v-content>
-        
+        <v-subheader>There are {{ verU.length }} verified users (of {{users.length}})</v-subheader> 
       <v-container>
        <v-data-table
         :headers="headers"
         :items="users"
-         show-actions
         class="elevation-1"
+        :rows-per-page-items="[200, 400]"
        >
     <template slot="items" slot-scope="props">
       <td>{{ props.item.name }}</td>
@@ -34,7 +34,7 @@
       <!-- <td class="text-xs-right">{{ props.item.provider }}</td> -->
       <!-- <td class="text-xs-right">{{ props.item.ver }} </td> -->
       <td class="text-xs-left">
-        <v-btn color="success" v-if="verUsers.includes(props.item.uid)">Verified
+        <v-btn color="success" v-if="verUsers.includes(props.item.uid)" @click="remVer(props.item.uid)">Verified
           <v-icon dark right>done</v-icon>
         </v-btn>
         <v-btn color="error" v-else @click="newVer(props.item.uid)">Not verified
@@ -100,9 +100,20 @@
     newVer: (uid) => {
       let verObj = {}
       verObj.uid = uid
-      verObj.location = "PZN" 
+      verObj.location = "POZ" 
       Vue.http.post("/addVer", verObj)
-      console.log(verObj);
+      //post new object and reload site to listen new app instance from node
+      location.reload()
+      // console.log(verObj);
+    },
+    remVer: (uid) => {
+      let verObj = {}
+      verObj.uid = uid 
+      Vue.http.post("/remVer", verObj)
+      // console.log(this.verU)
+      //post new object and reload site to listen new app instance from node
+      location.reload()
+      // console.log(verObj);
     }
   }
 });
